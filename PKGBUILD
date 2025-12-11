@@ -1,24 +1,26 @@
+# Maintainer: arcceus <https://github.com/arcceus>
 pkgname=phonecall-popup-git
 _pkgname=phonecall-popup
 pkgver=r2.g5373d10
 pkgrel=1
 pkgdesc="GTK popup for PipeWire telephony calls with answer/hangup"
 arch=('any')
+url="https://github.com/arcceus/phonecall-popup"
 license=('MIT')
 depends=('python' 'python-dbus' 'python-gobject' 'pipewire')
 makedepends=('git')
 provides=("${_pkgname}")
 conflicts=("${_pkgname}")
-source=("git+https://github.com/arcceus/${_pkgname}.git")
+source=("${_pkgname}::git+https://github.com/arcceus/${_pkgname}.git")
 sha256sums=('SKIP')
 
 pkgver() {
-  cd "${srcdir}/${_pkgname}"
+  cd "${_pkgname}"
   printf "r%s.g%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 package() {
-  cd "${srcdir}/${_pkgname}"
+  cd "${_pkgname}"
 
   install -Dm755 gtk_popup.py \
     "$pkgdir/usr/lib/${_pkgname}/gtk_popup.py"
