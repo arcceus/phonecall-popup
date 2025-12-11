@@ -2,3 +2,5 @@ pkg
 src
 *.pkg.tar
 phonecall-popup
+help
+pip
