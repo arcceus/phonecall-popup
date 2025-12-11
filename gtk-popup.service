@@ -1,0 +1,10 @@
+[Unit]
+Description=GTK phone popup
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/lib/gtk-phone-popup/gtk_popup.py
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
