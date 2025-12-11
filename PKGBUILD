@@ -1,25 +1,47 @@
-pkgname=gtk-phone-popup
-pkgver=0.1.0
+pkgname=phonecall-popup-git
+_pkgname=phonecall-popup
+pkgver=r2.g5373d10
 pkgrel=1
 pkgdesc="GTK popup for PipeWire telephony calls with answer/hangup"
 arch=('any')
-license=('custom:MIT')  # adjust if different
+license=('MIT')
 depends=('python' 'python-dbus' 'python-gobject' 'pipewire')
-source=("git+https://github.com/arcceus/gtk-phone-popup-pkg.git"
-        "gtk-popup.service")
-sha256sums=('SKIP' 'SKIP')
+makedepends=('git')
+provides=("${_pkgname}")
+conflicts=("${_pkgname}")
+source=("git+https://github.com/arcceus/${_pkgname}.git")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "${srcdir}/${_pkgname}"
+  printf "r%s.g%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
 
 package() {
-  install -Dm755 "$srcdir/gtk_popup.py" \
-    "$pkgdir/usr/lib/gtk-phone-popup/gtk_popup.py"
+  cd "${srcdir}/${_pkgname}"
 
-  # Tiny wrapper for PATH
-  install -Dm755 /dev/stdin "$pkgdir/usr/bin/gtk-phone-popup" <<'EOF'
+  install -Dm755 gtk_popup.py \
+    "$pkgdir/usr/lib/${_pkgname}/gtk_popup.py"
+
+  install -Dm755 /dev/stdin "$pkgdir/usr/bin/${_pkgname}" <<'EOF'
 #!/usr/bin/env bash
-exec python3 /usr/lib/gtk-phone-popup/gtk_popup.py "$@"
+exec python3 /usr/lib/phonecall-popup/gtk_popup.py "$@"
 EOF
 
-  # User service to auto-start
-  install -Dm644 "$srcdir/gtk-popup.service" \
-    "$pkgdir/usr/lib/systemd/user/gtk-popup.service"
+  install -Dm644 /dev/stdin \
+    "$pkgdir/usr/lib/systemd/user/${_pkgname}.service" <<'EOF'
+[Unit]
+Description=Phone call popup
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/bin/phonecall-popup
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+
+  install -Dm644 LICENSE \
+    "$pkgdir/usr/share/licenses/${pkgname}/LICENSE"
 }
